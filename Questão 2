@@ -1,0 +1,221 @@
+import java.util.ArrayList;
+import java.util.Scanner;
+
+class Automovel {
+    private String marca;
+    private String modelo;
+
+    public Automovel() {
+    }
+
+    public Automovel(String marca, String modelo) {
+        this.marca = marca;
+        this.modelo = modelo;
+    }
+
+    public String getMarca() {
+        return marca;
+    }
+
+    public void setMarca(String marca) {
+        this.marca = marca;
+    }
+
+    public String getModelo() {
+        return modelo;
+    }
+
+    public void setModelo(String modelo) {
+        this.modelo = modelo;
+    }
+
+    public String imprimir() {
+        return "Marca: " + marca + ", Modelo: " + modelo;
+    }
+}
+
+class Pessoa {
+    private int codigo;
+    private String nome;
+    private ArrayList<Automovel> automoveis;
+
+    public Pessoa() {
+        automoveis = new ArrayList<>();
+    }
+
+    public Pessoa(int codigo, String nome) {
+        this.codigo = codigo;
+        this.nome = nome;
+        automoveis = new ArrayList<>();
+    }
+
+    public int getCodigo() {
+        return codigo;
+    }
+
+    public void setCodigo(int codigo) {
+        this.codigo = codigo;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public void inserirAutomovel(Automovel automovel) {
+        automoveis.add(automovel);
+    }
+
+    public void removerAutomovel(int index) {
+        if (index >= 0 && index < automoveis.size()) {
+            automoveis.remove(index);
+        }
+    }
+
+    public String imprimir() {
+        return "Código: " + codigo + ", Nome: " + nome;
+    }
+
+    public String imprimirCompleto() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Código: ").append(codigo).append(", Nome: ").append(nome).append("\n");
+        builder.append("Automóveis:\n");
+        automoveis.forEach(automovel -> {
+            builder.append("- ").append(automovel.imprimir()).append("\n");
+        });
+        return builder.toString();
+    }
+
+    public ArrayList<Automovel> getAutomoveis() {
+        return automoveis;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        ArrayList<Pessoa> pessoas = new ArrayList<>();
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("Menu:");
+            System.out.println("1 – Criar Pessoa");
+            System.out.println("2 – Criar Automóvel");
+            System.out.println("3 – Transferir Automóvel");
+            System.out.println("4 – Mostrar Todas as Pessoas");
+            System.out.println("5 – Mostrar automóvel da pessoa");
+            System.out.println("6 – Sair");
+
+            int escolha = scanner.nextInt();
+
+            switch (escolha) {
+                case 1 -> criarPessoa(pessoas);
+                case 2 -> criarAutomovel(pessoas);
+                case 3 -> transferirAutomovel(pessoas);
+                case 4 -> mostrarTodasAsPessoas(pessoas);
+                case 5 -> mostrarAutomovelDaPessoa(pessoas);
+                case 6 -> {
+                    System.out.println("Saindo do programa.");
+                    scanner.close();
+                    System.exit(0);
+                }
+                default -> System.out.println("Escolha inválida. Tente novamente.");
+            }
+        }
+    }
+
+    private static void criarPessoa(ArrayList<Pessoa> pessoas) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Digite o código da pessoa: ");
+        int codigo = scanner.nextInt();
+        System.out.print("Digite o nome da pessoa: ");
+        String nome = scanner.next();
+        Pessoa pessoa = new Pessoa(codigo, nome);
+        pessoas.add(pessoa);
+        System.out.println("Pessoa criada com sucesso.");
+    }
+
+    private static void criarAutomovel(ArrayList<Pessoa> pessoas) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Digite a marca do automóvel: ");
+        String marca = scanner.next();
+        System.out.print("Digite o modelo do automóvel: ");
+        String modelo = scanner.next();
+        Automovel automovel = new Automovel(marca, modelo);
+
+        System.out.println("Selecione a pessoa para associar o automóvel:");
+        mostrarTodasAsPessoas(pessoas);
+        int escolha = scanner.nextInt();
+
+        if (escolha >= 1 && escolha <= pessoas.size()) {
+            Pessoa pessoa = pessoas.get(escolha - 1);
+            pessoa.inserirAutomovel(automovel);
+            System.out.println("Automóvel associado à pessoa com sucesso.");
+        } else {
+            System.out.println("Opção inválida.");
+        }
+    }
+
+    private static void transferirAutomovel(ArrayList<Pessoa> pessoas) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Selecione a pessoa de origem:");
+        mostrarTodasAsPessoas(pessoas);
+        int origemIndex = scanner.nextInt();
+
+        System.out.println("Selecione o automóvel a ser transferido:");
+        Pessoa origem = pessoas.get(origemIndex - 1);
+        ArrayList<Automovel> automoveisOrigem = origem.getAutomoveis();
+        for (int i = 0; i < automoveisOrigem.size(); i++) {
+            System.out.println((i + 1) + " - " + automoveisOrigem.get(i).imprimir());
+        }
+        int automovelIndex = scanner.nextInt();
+
+        System.out.println("Selecione a pessoa de destino:");
+        mostrarTodasAsPessoas(pessoas);
+        int destinoIndex = scanner.nextInt();
+
+        if (origemIndex >= 1 && origemIndex <= pessoas.size() &&
+            automovelIndex >= 1 && automovelIndex <= automoveisOrigem.size() &&
+            destinoIndex >= 1 && destinoIndex <= pessoas.size()) {
+
+            Pessoa destino = pessoas.get(destinoIndex - 1);
+            Automovel automovel = automoveisOrigem.get(automovelIndex - 1);
+
+            origem.removerAutomovel(automovelIndex - 1);
+            destino.inserirAutomovel(automovel);
+
+            System.out.println("Automóvel transferido com sucesso.");
+        } else {
+            System.out.println("Opção inválida.");
+        }
+    }
+
+    private static void mostrarTodasAsPessoas(ArrayList<Pessoa> pessoas) {
+        System.out.println("Pessoas:");
+        for (int i = 0; i < pessoas.size(); i++) {
+            System.out.println((i + 1) + " - " + pessoas.get(i).imprimir());
+        }
+    }
+
+    private static void mostrarAutomovelDaPessoa(ArrayList<Pessoa> pessoas) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Selecione a pessoa para listar os automóveis:");
+        mostrarTodasAsPessoas(pessoas);
+        int pessoaIndex = scanner.nextInt();
+
+        if (pessoaIndex >= 1 && pessoaIndex <= pessoas.size()) {
+            Pessoa pessoa = pessoas.get(pessoaIndex - 1);
+            ArrayList<Automovel> automoveis = pessoa.getAutomoveis();
+            System.out.println("Automóveis de " + pessoa.getNome() + ":");
+            for (int i = 0; i < automoveis.size(); i++) {
+                System.out.println((i + 1) + " - " + automoveis.get(i).imprimir());
+            }
+        } else {
+            System.out.println("Opção inválida.");
+        }
+    }
+}
