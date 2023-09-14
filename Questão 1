@@ -1,0 +1,243 @@
+import java.util.ArrayList;
+import java.util.Scanner;
+
+class Aluno {
+    private String ra;
+    private String nome;
+
+    public Aluno() {
+    }
+
+    public Aluno(String ra, String nome) {
+        this.ra = ra;
+        this.nome = nome;
+    }
+
+    public String getRa() {
+        return ra;
+    }
+
+    public void setRa(String ra) {
+        this.ra = ra;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public String imprimir() {
+        return "RA: " + ra + ", Nome: " + nome;
+    }
+}
+
+class Curso {
+    private int codigo;
+    private String nome;
+    private int cargaHoraria;
+    private ArrayList<Aluno> alunos;
+
+    public Curso() {
+        alunos = new ArrayList<>();
+    }
+
+    public Curso(int codigo, String nome, int cargaHoraria) {
+        this.codigo = codigo;
+        this.nome = nome;
+        this.cargaHoraria = cargaHoraria;
+        alunos = new ArrayList<>();
+    }
+
+    public int getCodigo() {
+        return codigo;
+    }
+
+    public void setCodigo(int codigo) {
+        this.codigo = codigo;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public int getCargaHoraria() {
+        return cargaHoraria;
+    }
+
+    public void setCargaHoraria(int cargaHoraria) {
+        this.cargaHoraria = cargaHoraria;
+    }
+
+    public void inserirAluno(Aluno aluno) {
+        alunos.add(aluno);
+    }
+
+    public void removerAluno(int index) {
+        if (index >= 0 && index < alunos.size()) {
+            alunos.remove(index);
+        }
+    }
+
+    public String imprimir() {
+        return "Código: " + codigo + ", Nome do Curso: " + nome + ", Carga Horária: " + cargaHoraria;
+    }
+
+    public String imprimirCompleto() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Código: ").append(codigo).append(", Nome do Curso: ").append(nome).append(", Carga Horária: ").append(cargaHoraria).append("\n");
+        builder.append("Alunos:\n");
+        for (Aluno aluno : alunos) {
+            builder.append("- ").append(aluno.imprimir()).append("\n");
+        }
+        return builder.toString();
+    }
+
+    public ArrayList<Aluno> getAlunos() {
+        return alunos;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        ArrayList<Curso> cursos = new ArrayList<>();
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("Menu:");
+            System.out.println("1 – Criar Curso");
+            System.out.println("2 – Criar Aluno");
+            System.out.println("3 – Remover Aluno");
+            System.out.println("4 – Mostrar Todos os Cursos");
+            System.out.println("5 – Mostrar alunos do curso");
+            System.out.println("6 – Sair");
+
+            int escolha = scanner.nextInt();
+
+            switch (escolha) {
+                case 1:
+                    criarCurso(cursos);
+                    break;
+                case 2:
+                    criarAluno(cursos);
+                    break;
+                case 3:
+                    removerAluno(cursos);
+                    break;
+                case 4:
+                    mostrarTodosOsCursos(cursos);
+                    break;
+                case 5:
+                    mostrarAlunosDoCurso(cursos);
+                    break;
+                case 6:
+                    System.out.println("Saindo do programa.");
+                    scanner.close();
+                    System.exit(0);
+                    break;
+                default:
+                    System.out.println("Escolha inválida. Tente novamente.");
+                    break;
+            }
+        }
+    }
+
+    private static void criarCurso(ArrayList<Curso> cursos) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Digite o código do curso: ");
+        int codigo = scanner.nextInt();
+        System.out.print("Digite o nome do curso: ");
+        String nome = scanner.next();
+        System.out.print("Digite a carga horária do curso: ");
+        int cargaHoraria = scanner.nextInt();
+        Curso curso = new Curso(codigo, nome, cargaHoraria);
+        cursos.add(curso);
+        System.out.println("Curso criado com sucesso.");
+    }
+
+    private static void criarAluno(ArrayList<Curso> cursos) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Digite o RA do aluno: ");
+        String ra = scanner.next();
+        System.out.print("Digite o nome do aluno: ");
+        String nome = scanner.next();
+
+        System.out.println("Selecione o curso do aluno:");
+        mostrarTodosOsCursos(cursos);
+        int escolha = scanner.nextInt();
+
+        if (escolha >= 1 && escolha <= cursos.size()) {
+            Curso curso = cursos.get(escolha - 1);
+            Aluno aluno = new Aluno(ra, nome);
+            curso.inserirAluno(aluno);
+            System.out.println("Aluno associado ao curso com sucesso.");
+        } else {
+            System.out.println("Opção inválida.");
+        }
+    }
+
+    private static void removerAluno(ArrayList<Curso> cursos) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Selecione o curso para remover o aluno:");
+        mostrarTodosOsCursos(cursos);
+        int cursoIndex = scanner.nextInt();
+
+        if (cursoIndex >= 1 && cursoIndex <= cursos.size()) {
+            Curso curso = cursos.get(cursoIndex - 1);
+
+            ArrayList<Aluno> alunos = curso.getAlunos();
+
+            if (alunos.isEmpty()) {
+                System.out.println("O curso não possui alunos.");
+            } else {
+                System.out.println("Selecione o aluno a ser removido:");
+                for (int i = 0; i < alunos.size(); i++) {
+                    System.out.println((i + 1) + " - " + alunos.get(i).imprimir());
+                }
+                int alunoIndex = scanner.nextInt();
+
+                if (alunoIndex >= 1 && alunoIndex <= alunos.size()) {
+                    curso.removerAluno(alunoIndex - 1);
+                    System.out.println("Aluno removido do curso com sucesso.");
+                } else {
+                    System.out.println("Opção inválida.");
+                }
+            }
+        } else {
+            System.out.println("Opção inválida.");
+        }
+    }
+
+    private static void mostrarTodosOsCursos(ArrayList<Curso> cursos) {
+        System.out.println("Cursos:");
+        for (int i = 0; i < cursos.size(); i++) {
+            System.out.println((i + 1) + " - " + cursos.get(i).imprimir());
+        }
+    }
+
+    private static void mostrarAlunosDoCurso(ArrayList<Curso> cursos) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Selecione o curso para listar os alunos:");
+        mostrarTodosOsCursos(cursos);
+        int cursoIndex = scanner.nextInt();
+
+        if (cursoIndex >= 1 && cursoIndex <= cursos.size()) {
+            Curso curso = cursos.get(cursoIndex - 1);
+            ArrayList<Aluno> alunos = curso.getAlunos();
+            System.out.println("Alunos do curso " + curso.getNome() + ":");
+            for (int i = 0; i < alunos.size(); i++) {
+                System.out.println((i + 1) + " - " + alunos.get(i).imprimir());
+            }
+        } else {
+            System.out.println("Opção inválida.");
+        }
+    }
+}
